@@ -7,9 +7,11 @@ function Home() {
   useEffect(() => {
     if (auth() == true) {
       Navigate(`/`);
+    } else {
+      Navigate(`/signin`);
     }
-  });
-  return <div></div>;
+  }, [Navigate]);
+  return <div>hello</div>;
 }
 
 export default Home;

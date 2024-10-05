@@ -52,7 +52,11 @@ export function SignIn() {
   };
 
   useEffect(() => {
-    if (auth() == true) {
+    // redirect to home page only when
+    // 1. auth returns true after checking the exp
+    // 2. loading will prevent it from jumping to / route if it is in the
+    // process of moving to home page during those 3 seconds , in which alert and loading button will appear
+    if (auth() == true && !loading) {
       Navigate(`/`);
     }
   });
