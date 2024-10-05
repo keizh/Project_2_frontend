@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import React from "react";
+import React, { useEffect } from "react";
 import { Alert, Button } from "@material-tailwind/react";
 
 function Icon() {
@@ -21,11 +21,13 @@ function Icon() {
 
 export default function AlertSystem({ message, color }) {
   const [open, setOpen] = React.useState(true);
-  setTimeout(() => {
-    if (!open) {
-      setOpen(false);
-    }
-  }, 3000);
+  useEffect(() => {
+    setTimeout(() => {
+      if (open) {
+        setOpen(false);
+      }
+    }, 5000);
+  }, []);
   return (
     <>
       <Alert

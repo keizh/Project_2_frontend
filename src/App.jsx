@@ -1,10 +1,11 @@
 import { Routes, Route } from "react-router-dom";
 import SignUp from "./pages/SignUp";
 import SignIn from "./pages/SignIn";
+import AddPost from "./pages/AddPost";
 import Home from "./pages/Home";
 import NavBar from "./components/NavBar";
 import { useEffect } from "react";
-import auth from "../utils/auth";
+import auth from "./utils/auth";
 import { useNavigate } from "react-router-dom";
 
 function PageDefault({ children }) {
@@ -18,14 +19,15 @@ function PageDefault({ children }) {
   }, [Navigate]);
   return (
     <>
-      <NavBar>{children}</NavBar>
+      <NavBar />
+      {children}
     </>
   );
 }
 
 export default function App() {
   return (
-    <div>
+    <div className="bg-[#eceff1]">
       <Routes>
         <Route path="/signup" element={<SignUp />} />
         <Route
@@ -33,6 +35,14 @@ export default function App() {
           element={
             <PageDefault>
               <Home />
+            </PageDefault>
+          }
+        />
+        <Route
+          path="/addPost"
+          element={
+            <PageDefault>
+              <AddPost />
             </PageDefault>
           }
         />

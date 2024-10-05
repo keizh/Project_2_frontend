@@ -194,7 +194,7 @@ export default function NavBar() {
   }, []);
 
   return (
-    <Navbar className="mx-auto max-w-screen-xl px-4 py-2">
+    <Navbar className="mx-auto max-w-screen-2xl px-4 py-2 fixed top-0 left-[50%] translate-x-[-50%] z-[2000]">
       <div className="flex items-center justify-between text-blue-gray-900">
         <Typography
           as="a"
@@ -202,7 +202,7 @@ export default function NavBar() {
           variant="h6"
           className="mr-4 cursor-pointer py-1.5 lg:ml-2"
         >
-          Material Tailwind
+          HASHTAG #
         </Typography>
         <div className="hidden lg:block">
           <NavList />
