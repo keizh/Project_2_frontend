@@ -8,6 +8,7 @@ const auth = () => {
   try {
     const decoded = jwtDecode(token);
     if (decoded.exp < Date.now() / 1000) {
+      localStorage.removeItem("token");
       return false;
     } else {
       return true;

@@ -183,7 +183,7 @@ function NavList() {
   );
 }
 
-export function MegaMenuWithHover() {
+export default function NavBar() {
   const [openNav, setOpenNav] = React.useState(false);
 
   React.useEffect(() => {
