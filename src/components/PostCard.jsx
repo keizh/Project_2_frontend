@@ -23,6 +23,8 @@ import {
   removeCommentThunk,
   removeLikeThunk,
   addLikeThunk,
+  AddLikes,
+  RemoveLikes,
 } from "../features/Post/PostSlice";
 import {
   removeBookMarkThunk,
@@ -114,10 +116,12 @@ function PostCard({ ele }) {
     if (liked) {
       // remove like & set false
       await dispatch(removeLikeThunk({ postId: ele._id }));
+      dispatch(RemoveLikes({ postId: ele._id, userId }));
       setLiked(false);
     } else {
       // add like & set true
       await dispatch(addLikeThunk({ postId: ele._id }));
+      dispatch(AddLikes({ postId: ele._id, userId }));
       setLiked(true);
     }
   };
@@ -126,10 +130,12 @@ function PostCard({ ele }) {
     if (bookmarked) {
       // remove like & set false
       await dispatch(removeBookMarkThunk({ postId: ele._id }));
+
       setBookmark(false);
     } else {
       // add like & set true
       await dispatch(addBookMarkThunk({ postId: ele._id }));
+
       setBookmark(true);
     }
   };
@@ -247,7 +253,7 @@ function PostCard({ ele }) {
               onClick={handleLikeClick}
               className="flex justify-center items-center gap-[10px] "
             >
-              <span className="text-[19px] hidden">{ele.likes.length}</span>
+              <span className="text-[19px]npm">{ele.likes.length}</span>
               <FaHeart
                 color={liked ? "red" : "black"}
                 className="text-[20px]"

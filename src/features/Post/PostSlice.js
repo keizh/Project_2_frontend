@@ -120,7 +120,32 @@ const PostSlice = createSlice({
     status: "idle", //'success' , 'loading' , 'error'
     error: null,
   },
-  reducers: {},
+  reducers: {
+    AddLikes: (state, action) => {
+      console.log(`hello addlike`);
+      state.posts = [
+        ...state.posts.map((ele) => {
+          if (ele._id == action.payload.postId) {
+            ele.likes = [...ele.likes, action.payload.userId];
+          }
+          return ele;
+        }),
+      ];
+    },
+    RemoveLikes: (state, action) => {
+      console.log(`hello removing like`);
+      state.posts = [
+        ...state.posts.map((ele) => {
+          if (ele._id == action.payload.postId) {
+            ele.likes = [
+              ...ele.likes.filter((userID) => userID != action.payload.userId),
+            ];
+          }
+          return ele;
+        }),
+      ];
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(AddPostThunk.pending, (state) => {
@@ -198,3 +223,4 @@ const PostSlice = createSlice({
 });
 
 export default PostSlice;
+export const { AddLikes, RemoveLikes } = PostSlice.actions;
