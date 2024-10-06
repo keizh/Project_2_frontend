@@ -46,6 +46,14 @@ export default function App() {
             </PageDefault>
           }
         />
+        {/* <Route
+          path="/profile/:id"
+          element={
+            <PageDefault>
+              <Profile />
+            </PageDefault>
+          }
+        /> */}
         <Route path="/signin" element={<SignIn />} />
       </Routes>
     </div>
