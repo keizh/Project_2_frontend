@@ -7,7 +7,7 @@ import {
 } from "@material-tailwind/react";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import AlertSystem from "../components/AlertSystem";
+import { showAlert } from "../features/Alert/AlertSlice";
 import { AddPostThunk } from "../features/Post/PostSlice";
 function AddPost() {
   const dispatch = useDispatch();
@@ -20,6 +20,7 @@ function AddPost() {
     images: Array.from({ length: images }),
   };
   const [data, setData] = useState(initialData);
+  const [length, setLength] = useState(initialData.content.length);
 
   useEffect(() => {
     setData((data) => ({
@@ -37,8 +38,9 @@ function AddPost() {
     try {
       await dispatch(AddPostThunk(dataToSend));
       if (status == "success") {
-        setAlert("success");
         setData(initialData);
+        dispatch(showAlert({ message: "Post Has been Made", color: "green" }));
+        setLength(0);
       } else {
         setAlert("fail");
       }
@@ -59,7 +61,7 @@ function AddPost() {
         </Typography>
         <form
           onSubmit={onSubmitHandler}
-          className="w-96 mt-16 mx-auto flex flex-col gap-5"
+          className="w-96 mt-16 mx-auto flex flex-col gap-5 mb-[100px]"
         >
           <div className="text-center">
             <Checkbox
@@ -162,23 +164,32 @@ function AddPost() {
             </>
           )}
           <Textarea
-            onChange={(e) =>
-              setData((data) => ({ ...data, [e.target.name]: e.target.value }))
-            }
+            onChange={(e) => {
+              const trimmedInput = e.target.value.trimStart(); // Trim start only once
+              const limited =
+                trimmedInput.length > 1000
+                  ? trimmedInput.slice(0, 1000)
+                  : trimmedInput;
+
+              setData((prevData) => ({
+                ...prevData,
+                [e.target.name]: limited,
+              }));
+
+              setLength(limited.length);
+            }}
             required
             name="content"
             label="Post Content"
             value={data.content}
+            rows="10"
           />
+          <p className="text-center">
+            <span>{length}/1000</span>
+          </p>
           <Button type="submit">Post</Button>
         </form>
       </div>
-      {alertSystem == "success" && (
-        <AlertSystem message="Post added Successfully" color="green" />
-      )}
-      {alertSystem == "fail" && (
-        <AlertSystem message="Failed to Add Post" color="red" />
-      )}
     </>
   );
 }

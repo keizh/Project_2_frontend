@@ -1,8 +1,8 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-
+import { showAlert } from "../Alert/AlertSlice";
 export const addBookMarkThunk = createAsyncThunk(
   "post/AddBookmark",
-  async (data) => {
+  async (data, { dispatch }) => {
     const response = await fetch(
       `http://localhost:5500/api/v1/bookmark/addBookmark`,
       {
@@ -16,13 +16,16 @@ export const addBookMarkThunk = createAsyncThunk(
     );
     const dataRes = await response.json();
     console.log(`completed adding Bookmark`);
+    dispatch(
+      showAlert({ message: "Post has been BookMarked", color: "green" })
+    );
     return dataRes;
   }
 );
 
 export const removeBookMarkThunk = createAsyncThunk(
   "post/RemoveBookmark",
-  async (data) => {
+  async (data, { dispatch }) => {
     const response = await fetch(
       `http://localhost:5500/api/v1/bookmark/removeBookMark/${data.postId}`,
       {
@@ -33,6 +36,7 @@ export const removeBookMarkThunk = createAsyncThunk(
       }
     );
     const dataRes = await response.json();
+    dispatch(showAlert({ message: "Bookmark is removed", color: "red" }));
     console.log(`completed REMOVING Bookmark`);
     return dataRes;
   }

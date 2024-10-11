@@ -1,7 +1,8 @@
 /* eslint-disable react/prop-types */
 import React, { useEffect } from "react";
 import { Alert, Button } from "@material-tailwind/react";
-
+import { useSelector, useDispatch } from "react-redux";
+import { hideAlert } from "../features/Alert/AlertSlice";
 function Icon() {
   return (
     <svg
@@ -20,36 +21,51 @@ function Icon() {
 }
 
 export default function AlertSystem({ message, color }) {
-  const [open, setOpen] = React.useState(true);
+  // const [open, setOpen] = React.useState(true);
+  const state = useSelector((state) => state.Alert);
+  const dispatch = useDispatch();
+  // useEffect(() => {
+  //   setTimeout(() => {
+  //     if (open) {
+  //       setOpen(false);
+  //     }
+  //   }, 10000);
+  // }, []);
   useEffect(() => {
-    setTimeout(() => {
-      if (open) {
-        setOpen(false);
-      }
-    }, 5000);
-  }, []);
+    state.forEach((ele) => {
+      const timer = setTimeout(() => {
+        dispatch(hideAlert({ id: ele.id }));
+      }, 3500);
+      console.log(ele.message);
+      return () => clearTimeout(timer);
+    });
+  }, [state, dispatch]);
   return (
     <>
-      <Alert
-        color={color}
-        className="fixed w-fit top-[10px] left-[10px]"
-        variant="gradient"
-        open={open}
-        icon={<Icon />}
-        action={
-          <Button
-            variant="text"
-            color="white"
-            size="sm"
-            className="!absolute top-3 right-1"
-            onClick={() => setOpen(false)}
-          >
-            Close
-          </Button>
-        }
-      >
-        <span className="pr-[20px]">{message}</span>
-      </Alert>
+      {state.map((alert, index) => (
+        <Alert
+          key={alert.id}
+          color={alert.color}
+          className={`fixed w-fit left-[10px] z-[3000]`}
+          style={{ top: `${10 + index * 60}px` }}
+          variant="gradient"
+          open={true}
+          icon={<Icon />}
+          action={
+            <Button
+              variant="text"
+              color="white"
+              size="sm"
+              className="!absolute top-3 right-1"
+              onClick={() => dispatch(hideAlert({ id: alert.id }))}
+            >
+              close
+            </Button>
+          }
+        >
+          <span className="px-[20px]">{alert.message}</span>
+        </Alert>
+      ))}
     </>
   );
 }

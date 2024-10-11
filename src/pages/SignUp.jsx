@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { z } from "zod";
 import { Typography, Input, Button, Alert } from "@material-tailwind/react";
 import { EyeSlashIcon, EyeIcon } from "@heroicons/react/24/solid";
 import { NavLink, useNavigate } from "react-router-dom";
 import AlertSystem from "../components/AlertSystem";
-
+import { showAlert, hideAlert } from "../features/Alert/AlertSlice";
+import { useDispatch } from "react-redux";
 function IconOutlined() {
   return (
     <svg
@@ -64,6 +65,7 @@ const signUpData = z.object({
 
 export function SignUp() {
   //   console.log(`-->`, URL);
+  const dispatch = useDispatch();
   const Navigate = useNavigate();
   const [passwordShown, setPasswordShown] = useState(false);
   const togglePasswordVisiblity = () => setPasswordShown((cur) => !cur);
@@ -109,7 +111,10 @@ export function SignUp() {
         const dataRes = await response.json();
         if (response.ok) {
           setDuplicateErr(null);
-          setLoading(true);
+          // setLoading(true);
+          dispatch(
+            showAlert({ message: "Successfully Signed Up", color: "green" })
+          );
           setTimeout(() => {
             setData(initialData);
             setError(initialDataErr);
@@ -133,8 +138,16 @@ export function SignUp() {
     }
   };
 
+  useEffect(() => {
+    dispatch(showAlert({ message: "tiger", color: "green" }));
+    dispatch(showAlert({ message: "tiger Signed Up", color: "green" }));
+    dispatch(showAlert({ message: "tiger Signed Up", color: "green" }));
+    dispatch(showAlert({ message: "tiger Signed Up", color: "green" }));
+    dispatch(showAlert({ message: "tiger Signed Up", color: "green" }));
+  });
+
   return (
-    <section className="grid text-center h-min-screen items-center p-8 relative">
+    <section className="grid text-center h-min-screen items-center p-8 relative bg-white">
       <div>
         <Typography className="mb-2" variant="h3" color="blue" textGradient>
           HASHTAG <span className="text-purple-500">#</span>
@@ -306,9 +319,9 @@ export function SignUp() {
           </Typography>
         </form>
       </div>
-      {loading && (
+      {/* {true && (
         <AlertSystem message="Account Created Successfully" color="green" />
-      )}
+      )} */}
     </section>
   );
 }

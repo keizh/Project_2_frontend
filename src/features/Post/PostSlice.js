@@ -21,7 +21,7 @@ export const fetchPostsThunk = createAsyncThunk("fetch/fetchPost", async () => {
     },
   });
   const dataRes = await response.json();
-  console.log(dataRes);
+  console.log(`posts have been `, dataRes);
   return dataRes.posts;
 });
 
@@ -165,7 +165,7 @@ const PostSlice = createSlice({
       })
       .addCase(fetchPostsThunk.fulfilled, (state, action) => {
         state.status = "success";
-        state.posts = [...action.payload];
+        state.posts = action.payload ? [...action.payload] : [];
       })
       .addCase(fetchPostsThunk.rejected, (state, action) => {
         state.status = "error";

@@ -7,20 +7,37 @@ import NavBar from "./components/NavBar";
 import { useEffect } from "react";
 import auth from "./utils/auth";
 import { useNavigate } from "react-router-dom";
+import AlertSystem from "./components/AlertSystem";
+import FriendSearch from "./pages/FriendSearch";
+import Profile from "./pages/Profile";
+import { useDispatch } from "react-redux";
+import fetchUserDetails from "./features/User/UserSlice";
 
 function PageDefault({ children }) {
   const Navigate = useNavigate();
-  useEffect(() => {
-    if (auth() == true) {
-      Navigate(`/`);
-    } else {
-      Navigate(`/signin`);
-    }
-  }, [Navigate]);
+  const dispatch = useDispatch();
+  // useEffect(() => {
+  //   if (auth()) {
+  //     Navigate(`/`);
+  //   } else {
+  //     Navigate(`/signin`);
+  //   }
+  // }, [Navigate]);
+
   return (
     <>
       <NavBar />
       {children}
+      <AlertSystem />
+    </>
+  );
+}
+
+function SSDefault({ children }) {
+  return (
+    <>
+      {children}
+      <AlertSystem />
     </>
   );
 }
@@ -29,32 +46,55 @@ export default function App() {
   return (
     <div className="bg-[#eceff1]">
       <Routes>
-        <Route path="/signup" element={<SignUp />} />
+        <Route
+          path="/signup"
+          element={
+            <SSDefault>
+              <SignUp />
+            </SSDefault>
+          }
+        />
         <Route
           path="/"
           element={
             <PageDefault>
               <Home />
+              {/* <AddPost /> */}
             </PageDefault>
           }
         />
         <Route
-          path="/addPost"
+          path="/addpost"
           element={
             <PageDefault>
               <AddPost />
             </PageDefault>
           }
         />
-        {/* <Route
+        <Route
+          path="/friends"
+          element={
+            <PageDefault>
+              <FriendSearch />
+            </PageDefault>
+          }
+        />
+        <Route
+          path="/signin"
+          element={
+            <SSDefault>
+              <SignIn />
+            </SSDefault>
+          }
+        />
+        <Route
           path="/profile/:id"
           element={
             <PageDefault>
               <Profile />
             </PageDefault>
           }
-        /> */}
-        <Route path="/signin" element={<SignIn />} />
+        />
       </Routes>
     </div>
   );

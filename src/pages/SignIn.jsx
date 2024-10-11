@@ -5,8 +5,10 @@ import { EyeSlashIcon, EyeIcon } from "@heroicons/react/24/solid";
 import AlertSystem from "../components/AlertSystem";
 import { useEffect } from "react";
 import auth from "../utils/auth";
-
+import { showAlert, hideAlert } from "../features/Alert/AlertSlice";
+import { useDispatch } from "react-redux";
 export function SignIn() {
+  const dispatch = useDispatch();
   const Navigate = useNavigate();
   const [passwordShown, setPasswordShown] = useState(false);
   const togglePasswordVisiblity = () => setPasswordShown((cur) => !cur);
@@ -38,7 +40,10 @@ export function SignIn() {
       const dataRes = await response.json();
       localStorage.setItem("token", dataRes.token);
       if (response.ok) {
-        setLoading(true);
+        // setLoading(true);
+        dispatch(
+          showAlert({ message: "Successfully Signed In", color: "green" })
+        );
         setTimeout(() => {
           setData(intialdata);
           Navigate("/");
@@ -62,7 +67,7 @@ export function SignIn() {
   });
 
   return (
-    <section className="grid text-center h-screen items-center p-8">
+    <section className="grid text-center h-screen items-center p-8 bg-white">
       <div>
         <Typography variant="h3" color="blue-gray" className="mb-2">
           Sign In

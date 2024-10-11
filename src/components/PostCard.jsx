@@ -17,6 +17,7 @@ import {
 import { AnimatePresence, motion } from "framer-motion";
 import { useState } from "react";
 import ProvideData from "../utils/ProvideData";
+import { removeBookMarkSYNC } from "../features/User/UserSlice";
 import { useDispatch } from "react-redux";
 import {
   addCommentThunk,
@@ -31,6 +32,7 @@ import {
   addBookMarkThunk,
 } from "../features/BookMark/BookMark";
 import { useEffect } from "react";
+import { NavLink } from "react-router-dom";
 
 function PostCard({ ele }) {
   const dispatch = useDispatch();
@@ -54,18 +56,15 @@ function PostCard({ ele }) {
     setCommentData("");
   };
 
-  // Extract day, month (in alphabet), and year
-  const day = date.getDate(); // Day of the month (1-31)
-  const month = date.toLocaleString("default", { month: "long" }); // Month name
-  const year = date.getFullYear(); // Year
+  const day = date.getDate();
+  const month = date.toLocaleString("default", { month: "long" });
+  const year = date.getFullYear();
 
-  // Extract the time as before (12-hour format)
   let hours = date.getHours();
   const minutes = date.getMinutes();
   const ampm = hours >= 12 ? "PM" : "AM";
-  hours = hours % 12 || 12; // Convert to 12-hour format
+  hours = hours % 12 || 12;
 
-  // Format time and date
   const formattedDate = `${day} ${month} ${year}`;
   const formattedTime = `${hours.toString().padStart(2, "0")}:${minutes
     .toString()
@@ -130,7 +129,7 @@ function PostCard({ ele }) {
     if (bookmarked) {
       // remove like & set false
       await dispatch(removeBookMarkThunk({ postId: ele._id }));
-
+      await dispatch(removeBookMarkSYNC({ postId: ele._id }));
       setBookmark(false);
     } else {
       // add like & set true
@@ -149,16 +148,24 @@ function PostCard({ ele }) {
       >
         <section className="mb-5 flex justify-between items-center">
           <div className="flex gap-5 items-center">
-            <Avatar
-              size="md"
-              className=" h-[30px] w-[30px] sm:h-[50px] sm:w-[50px]"
-              variant="circular"
-              src="https://images.unsplash.com/photo-1633332755192-727a05c4013d?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1480&q=80"
-              alt="tania andrew"
-            />
-            <Typography variant="h5" color="blue-gray">
-              {ele.userName}
-            </Typography>
+            <NavLink
+              className="inline-block flex gap-5 items-center"
+              to={`/profile/${ele.userId}`}
+            >
+              <Avatar
+                size="md"
+                className=" h-[30px] w-[30px] sm:h-[50px] sm:w-[50px]"
+                variant="circular"
+                src={
+                  "https://images.unsplash.com/photo-1633332755192-727a05c4013d?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1480&q=80"
+                }
+                alt="tania andrew"
+              />
+
+              <Typography variant="h5" color="blue-gray">
+                {ele.userName}
+              </Typography>
+            </NavLink>
           </div>
           <div className="flex flex-col items-end gap-2">
             <span className="w-[100px] bg-[#ffca28] h-[10px] rounded"></span>
@@ -166,6 +173,7 @@ function PostCard({ ele }) {
             <span className="w-[50px] bg-[#9c27b0] h-[10px] rounded hidden sm:block"></span>
           </div>
         </section>
+
         {ele.images.length > 0 && (
           <Carousel className="rounded-xl h-[60vh] max-h-[500px] bg-[#90a4ae]">
             {ele.images.map((ele, index) => (
@@ -284,7 +292,9 @@ function PostCard({ ele }) {
                 />
               </svg>
 
-              <span className=" text-red-700 text-[14px]">Comments</span>
+              <span className=" text-red-700 text-[14px] hidden sm:block">
+                Comments
+              </span>
             </Button>
             {/* BookMark Button */}
             <Button
@@ -323,87 +333,91 @@ function PostCard({ ele }) {
             exit="close"
             className={` border-4 p-2  h-[200px] w-[90%] backdrop-blur-xl  absolute  ${
               ele.images.length > 0 ? "bottom-[20%]" : "bottom-[40%]"
-            }  z-[1000] left-[50%] translate-x-[-50%] rounded overflow-y-scroll scroller`}
+            }  z-[1000] left-[50%] translate-x-[-50%] rounded overflow-y-scroll overflow-x-hidden scroller overflow-x-none`}
           >
-            {ele.comments.length > 0 &&
-              ele.comments.map((commData, index) => (
-                <div
-                  key={index}
-                  className="p-1 bg-white mb-2 rounded flex justify-between"
-                >
-                  <span>{commData.content}</span>
-                  <div className="flex gap-1 items-center ">
-                    {userId == commData.userId && (
-                      <Button
-                        color="green"
-                        className=" p-2 hover:scale-[1.1] self-start rounded"
-                        onClick={async () => {
-                          var comm = commData.content;
-                          await dispatch(
-                            removeCommentThunk({
-                              postId: ele._id,
-                              commentId: commData.commentId,
-                            })
-                          );
-                          setCommentData(comm);
-                        }}
-                        whileHover={{ scale: 1.1 }}
-                      >
-                        {" "}
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke-width="1.5"
-                          stroke="currentColor"
-                          class="size-4"
+            <div className="w-[100%]">
+              {ele.comments.length > 0 &&
+                ele.comments.map((commData, index) => (
+                  <div
+                    key={index}
+                    className="p-1 bg-white mb-2 rounded flex justify-between "
+                  >
+                    <div className="whitespace-pre-line w-[calc(100%-70px)]">
+                      {commData.content}
+                    </div>
+                    <div className="flex gap-1 items-center w-fit">
+                      {userId == commData.userId && (
+                        <Button
+                          color="green"
+                          className=" p-2 hover:scale-[1.1] self-start rounded"
+                          onClick={async () => {
+                            var comm = commData.content;
+                            await dispatch(
+                              removeCommentThunk({
+                                postId: ele._id,
+                                commentId: commData.commentId,
+                              })
+                            );
+                            setCommentData(comm);
+                          }}
+                          whileHover={{ scale: 1.1 }}
                         >
-                          <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10"
-                          />
-                        </svg>
-                      </Button>
-                    )}
-                    {(ele.userId == userId || userId == commData.userId) && (
-                      <motion.button
-                        className="bg-red-500 p-2 self-start rounded"
-                        onClick={() =>
-                          dispatch(
-                            removeCommentThunk({
-                              postId: ele._id,
-                              commentId: commData.commentId,
-                            })
-                          )
-                        }
-                        whileHover={{ scale: 1.1 }}
-                      >
-                        {" "}
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke-width="1.5"
-                          stroke="black"
-                          class="size-4"
+                          {" "}
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke-width="1.5"
+                            stroke="currentColor"
+                            class="size-4"
+                          >
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10"
+                            />
+                          </svg>
+                        </Button>
+                      )}
+                      {(ele.userId == userId || userId == commData.userId) && (
+                        <motion.button
+                          className="bg-red-500 p-2 self-start rounded"
+                          onClick={() =>
+                            dispatch(
+                              removeCommentThunk({
+                                postId: ele._id,
+                                commentId: commData.commentId,
+                              })
+                            )
+                          }
+                          whileHover={{ scale: 1.1 }}
                         >
-                          <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"
-                          />
-                        </svg>
-                      </motion.button>
-                    )}
+                          {" "}
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke-width="1.5"
+                            stroke="black"
+                            class="size-4"
+                          >
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"
+                            />
+                          </svg>
+                        </motion.button>
+                      )}
+                    </div>
                   </div>
-                </div>
-              ))}
-            {ele.comments.length == 0 && (
-              <span className="p-2 bg-white mb-2 rounded inline-block">
-                No Comments Yet !
-              </span>
-            )}
+                ))}
+              {ele.comments.length == 0 && (
+                <span className="p-2 bg-white mb-2 rounded inline-block">
+                  No Comments Yet !
+                </span>
+              )}
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
