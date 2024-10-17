@@ -6,17 +6,24 @@ import { showAlert, hideAlert } from "../features/Alert/AlertSlice";
 import {
   postFollowRequest,
   removeFollowRequest,
+  postFollowRequestSYNCFollowStatus,
+  FollowReqSendOtherUserSYNC,
+  removeFollowRequestSYNCFollowStatus,
+  RemoveFollowReqSendOtherUserSYNC,
 } from "../features/User/UserSlice";
 import { useDispatch, useSelector } from "react-redux";
 import ProvideData from "../utils/ProvideData";
 function AvatarComp({ person }) {
   const { userId } = ProvideData();
   const dispatch = useDispatch();
-  const [followRequest, setFollowRequest] = useState(false);
+  const [followRequest, setFollowRequest] = useState(
+    person.isUSERfollowingStatus
+  );
   const [loading, setLoading] = useState(false);
   const { user } = useSelector((state) => state.User);
+
   const handlerRequestSent = async () => {
-    setFollowRequest(true);
+    setLoading(true);
     await dispatch(
       postFollowRequest({
         userId: person._id,
@@ -24,30 +31,24 @@ function AvatarComp({ person }) {
         profileImageOfReciever: person.profileImage,
       })
     );
+    setFollowRequest("REQ_SENT");
+    setLoading(false);
+    dispatch(postFollowRequestSYNCFollowStatus({ userId: person._id }));
+    dispatch(FollowReqSendOtherUserSYNC({ userId: person._id }));
     dispatch(showAlert({ message: "Follow Request Sent", color: "green" }));
   };
-
   const handlerCancelRequest = async () => {
-    setFollowRequest(false);
+    setLoading(true);
     await dispatch(
       removeFollowRequest({ userId2: person._id, userId1: userId })
     );
+    setFollowRequest("NOT_FOLLOWING");
+    setLoading(false);
+    dispatch(removeFollowRequestSYNCFollowStatus({ userId: person._id }));
+    dispatch(RemoveFollowReqSendOtherUserSYNC({ userId: person._id }));
     dispatch(showAlert({ message: "Cancelled Follow Request", color: "red" }));
   };
 
-  useEffect(() => {
-    setLoading(true);
-
-    person.requestUpdates.forEach((ele) => {
-      if (
-        ele.userIdOfSender == userId &&
-        ele.userIdtoWhomIsWasSent == person._id
-      ) {
-        setFollowRequest(true);
-      }
-    });
-    setLoading(false);
-  }, []);
   return (
     <>
       <div className="rounded-xl flex items-center gap-4 p-2 bg-white">
@@ -59,8 +60,8 @@ function AvatarComp({ person }) {
           </Typography>
         </div>
         {loading == true ? (
-          <Button loading={true} className="ml-auto"></Button>
-        ) : followRequest ? (
+          <Button loading={loading} className="ml-auto"></Button>
+        ) : followRequest == "REQ_SENT" ? (
           <Button onClick={handlerCancelRequest} className="ml-auto">
             Cancel Request
           </Button>

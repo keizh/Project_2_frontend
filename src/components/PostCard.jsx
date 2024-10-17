@@ -2,6 +2,7 @@
 /* eslint-disable react/prop-types */
 import { FaHeart } from "react-icons/fa";
 import { FaBookmark, FaRegBookmark } from "react-icons/fa";
+import { CiMenuKebab } from "react-icons/ci";
 import {
   Card,
   CardHeader,
@@ -12,36 +13,57 @@ import {
   Carousel,
   Avatar,
   Button,
+  Menu,
+  MenuHandler,
+  MenuItem,
+  MenuList,
+  useSelect,
 } from "@material-tailwind/react";
 
 import { AnimatePresence, motion } from "framer-motion";
 import { useState } from "react";
 import ProvideData from "../utils/ProvideData";
 import { removeBookMarkSYNC } from "../features/User/UserSlice";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import {
   addCommentThunk,
   removeCommentThunk,
   removeLikeThunk,
   addLikeThunk,
   AddLikes,
+  deletePostThunk,
   RemoveLikes,
+  UpdateBookMarkStateInPostsToFalse,
+  UpdateBookMarkStateInPostsToTrue,
 } from "../features/Post/PostSlice";
 import {
   removeBookMarkThunk,
   addBookMarkThunk,
 } from "../features/BookMark/BookMark";
 import { useEffect } from "react";
-import { NavLink } from "react-router-dom";
-
-function PostCard({ ele }) {
+import { NavLink, useParams } from "react-router-dom";
+import {
+  fetchUserDetails,
+  fetchPosts,
+  fetchBookMarks,
+} from "../features/User/UserSlice";
+function PostCard({
+  ele,
+  showDeleteOptionOnlyInProfilePostsSections,
+  showBookmarkOptionOnlyInProfilePostsSections,
+  bookmarkedProp = null,
+  notInHome = null,
+  areWeOnProfilePage = null,
+}) {
+  const { id } = useParams();
   const dispatch = useDispatch();
   const date = new Date(ele.createdAt);
   const [comment, setComment] = useState(false);
-  const [liked, setLiked] = useState(false);
+  // const [liked, setLiked] = useState(ele.userLiked);
   const [commentData, setCommentData] = useState("");
-  const [bookmarked, setBookmark] = useState(false);
+  // const [bookmarked, setBookmark] = useState(ele.userBookmark);
   const { userName, userId, name } = ProvideData();
+  const { user } = useSelector((state) => state.User);
 
   const handlerCommentData = (e) => {
     const { value } = e.target;
@@ -52,8 +74,16 @@ function PostCard({ ele }) {
 
   const submitComment = async () => {
     console.log(`clicked`);
-    await dispatch(addCommentThunk({ content: commentData, postId: ele._id }));
-    setCommentData("");
+    if (commentData.trim() != "") {
+      await dispatch(
+        addCommentThunk({ content: commentData, postId: ele._id })
+      );
+      if (notInHome === true) {
+        await dispatch(fetchPosts({ id }));
+        await dispatch(fetchBookMarks({ id }));
+      }
+      setCommentData("");
+    }
   };
 
   const day = date.getDate();
@@ -70,77 +100,54 @@ function PostCard({ ele }) {
     .toString()
     .padStart(2, "0")} ${ampm}`;
 
-  async function checking() {
-    const response = await fetch(
-      `http://localhost:5500/api/v1/post/isLikedOrNot`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: localStorage.getItem(`token`),
-        },
-        body: JSON.stringify({ postId: ele._id }),
-      }
-    );
-    const dataRes = await response.json();
-    if (dataRes.message) {
-      setLiked(true);
-    }
-  }
-
-  async function checkingBookmark() {
-    const response = await fetch(
-      `http://localhost:5500/api/v1/bookmark/checking`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: localStorage.getItem(`token`),
-        },
-        body: JSON.stringify({ postId: ele._id }),
-      }
-    );
-    const dataRes = await response.json();
-    if (dataRes.message) {
-      setBookmark(true);
-    }
-  }
-
-  useEffect(() => {
-    checking();
-    checkingBookmark();
-  }, []);
-
   const handleLikeClick = async () => {
-    if (liked) {
+    if (ele.userLiked) {
       // remove like & set false
       await dispatch(removeLikeThunk({ postId: ele._id }));
       dispatch(RemoveLikes({ postId: ele._id, userId }));
-      setLiked(false);
+      // experimental ---> setLiked(false);
     } else {
       // add like & set true
       await dispatch(addLikeThunk({ postId: ele._id }));
       dispatch(AddLikes({ postId: ele._id, userId }));
-      setLiked(true);
+      // experimental ---> setLiked(true);
+    }
+
+    if (notInHome === true) {
+      await dispatch(fetchPosts({ id }));
+      await dispatch(fetchBookMarks({ id }));
     }
   };
 
   const handleBookmark = async () => {
-    if (bookmarked) {
+    if (ele.userBookmark) {
       // remove like & set false
       await dispatch(removeBookMarkThunk({ postId: ele._id }));
-      await dispatch(removeBookMarkSYNC({ postId: ele._id }));
-      setBookmark(false);
+      dispatch(removeBookMarkSYNC({ postId: ele._id }));
+      dispatch(UpdateBookMarkStateInPostsToFalse({ postId: ele._id }));
+      // experimental --->setBookmark(false);
     } else {
       // add like & set true
       await dispatch(addBookMarkThunk({ postId: ele._id }));
+      await dispatch(UpdateBookMarkStateInPostsToTrue({ postId: ele._id }));
 
-      setBookmark(true);
+      // setBookmark(true);
+    }
+
+    if (notInHome === true) {
+      await dispatch(fetchPosts({ id }));
+      await dispatch(fetchBookMarks({ id }));
     }
   };
 
+  const DeletePost = async (id) => {
+    await dispatch(deletePostThunk({ id }));
+  };
+
+  useEffect(() => {}, [user]);
+
   return (
-    <Card className="w-[100%] h-fit relative">
+    <Card className="w-[100%] h-fit relative mb-5">
       <CardHeader
         floated={false}
         className="shadow-none"
@@ -167,10 +174,30 @@ function PostCard({ ele }) {
               </Typography>
             </NavLink>
           </div>
-          <div className="flex flex-col items-end gap-2">
-            <span className="w-[100px] bg-[#ffca28] h-[10px] rounded"></span>
-            <span className="w-[75px] bg-[#4fc3f7] h-[10px] rounded"></span>
-            <span className="w-[50px] bg-[#9c27b0] h-[10px] rounded hidden sm:block"></span>
+          <div className="flex gap-2">
+            <div className="flex flex-col items-end gap-2">
+              <span className="w-[100px] bg-[#ffca28] h-[10px] rounded"></span>
+              <span className="w-[75px] bg-[#4fc3f7] h-[10px] rounded"></span>
+              <span className="w-[50px] bg-[#9c27b0] h-[10px] rounded hidden sm:block"></span>
+            </div>
+            {showDeleteOptionOnlyInProfilePostsSections && (
+              <Menu placement="left-start">
+                <MenuHandler>
+                  <button>
+                    <CiMenuKebab className="text-[30px]" />
+                  </button>
+                </MenuHandler>
+                <MenuList>
+                  <MenuItem
+                    onClick={() => DeletePost(ele._id)}
+                    className="p-2 text-center bg-red-500 text-white font-black"
+                  >
+                    {" "}
+                    Delete Post
+                  </MenuItem>
+                </MenuList>
+              </Menu>
+            )}
           </div>
         </section>
 
@@ -263,7 +290,7 @@ function PostCard({ ele }) {
             >
               <span className="text-[19px]npm">{ele.likes.length}</span>
               <FaHeart
-                color={liked ? "red" : "black"}
+                color={ele.userLiked ? "red" : "black"}
                 className="text-[20px]"
               />
             </Button>
@@ -297,17 +324,19 @@ function PostCard({ ele }) {
               </span>
             </Button>
             {/* BookMark Button */}
-            <Button
-              color="white"
-              className="flex justify-center items-center gap-[10px] "
-              onClick={handleBookmark}
-            >
-              {bookmarked ? (
-                <FaBookmark className="text-[20px]" />
-              ) : (
-                <FaRegBookmark className="text-[20px]" />
-              )}
-            </Button>
+            {showBookmarkOptionOnlyInProfilePostsSections && (
+              <Button
+                color="white"
+                className="flex justify-center items-center gap-[10px] "
+                onClick={handleBookmark}
+              >
+                {ele.userBookmark ? (
+                  <FaBookmark className="text-[20px]" />
+                ) : (
+                  <FaRegBookmark className="text-[20px]" />
+                )}
+              </Button>
+            )}
           </div>
         </div>
       </CardFooter>
@@ -340,76 +369,85 @@ function PostCard({ ele }) {
                 ele.comments.map((commData, index) => (
                   <div
                     key={index}
-                    className="p-1 bg-white mb-2 rounded flex justify-between "
+                    className="p-1 bg-white mb-2 rounded flex flex-col "
                   >
-                    <div className="whitespace-pre-line w-[calc(100%-70px)]">
-                      {commData.content}
-                    </div>
-                    <div className="flex gap-1 items-center w-fit">
-                      {userId == commData.userId && (
-                        <Button
-                          color="green"
-                          className=" p-2 hover:scale-[1.1] self-start rounded"
-                          onClick={async () => {
-                            var comm = commData.content;
-                            await dispatch(
-                              removeCommentThunk({
-                                postId: ele._id,
-                                commentId: commData.commentId,
-                              })
-                            );
-                            setCommentData(comm);
-                          }}
-                          whileHover={{ scale: 1.1 }}
-                        >
-                          {" "}
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke-width="1.5"
-                            stroke="currentColor"
-                            class="size-4"
+                    <div className="flex justify-between">
+                      <div className="whitespace-pre-line w-[calc(100%-70px)]">
+                        {commData.content}
+                      </div>
+                      <div className="flex gap-1 items-center w-fit">
+                        {userId == commData.userId && (
+                          <Button
+                            color="green"
+                            className=" p-2 hover:scale-[1.1] self-start rounded"
+                            onClick={async () => {
+                              var comm = commData.content;
+                              await dispatch(
+                                removeCommentThunk({
+                                  postId: ele._id,
+                                  commentId: commData.commentId,
+                                  areWeOnProfilePage,
+                                  id,
+                                })
+                              );
+                              setCommentData(comm);
+                            }}
+                            whileHover={{ scale: 1.1 }}
                           >
-                            <path
-                              stroke-linecap="round"
-                              stroke-linejoin="round"
-                              d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10"
-                            />
-                          </svg>
-                        </Button>
-                      )}
-                      {(ele.userId == userId || userId == commData.userId) && (
-                        <motion.button
-                          className="bg-red-500 p-2 self-start rounded"
-                          onClick={() =>
-                            dispatch(
-                              removeCommentThunk({
-                                postId: ele._id,
-                                commentId: commData.commentId,
-                              })
-                            )
-                          }
-                          whileHover={{ scale: 1.1 }}
-                        >
-                          {" "}
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke-width="1.5"
-                            stroke="black"
-                            class="size-4"
+                            {" "}
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              stroke-width="1.5"
+                              stroke="currentColor"
+                              class="size-4"
+                            >
+                              <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10"
+                              />
+                            </svg>
+                          </Button>
+                        )}
+                        {(ele.userId == userId ||
+                          userId == commData.userId) && (
+                          <motion.button
+                            className="bg-red-500 p-2 self-start rounded"
+                            onClick={() => {
+                              dispatch(
+                                removeCommentThunk({
+                                  postId: ele._id,
+                                  commentId: commData.commentId,
+                                })
+                              );
+                              if (notInHome === true) {
+                                dispatch(fetchPosts({ id }));
+                                dispatch(fetchBookMarks({ id }));
+                              }
+                            }}
+                            whileHover={{ scale: 1.1 }}
                           >
-                            <path
-                              stroke-linecap="round"
-                              stroke-linejoin="round"
-                              d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"
-                            />
-                          </svg>
-                        </motion.button>
-                      )}
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              stroke-width="1.5"
+                              stroke="black"
+                              class="size-4"
+                            >
+                              <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"
+                              />
+                            </svg>
+                          </motion.button>
+                        )}
+                      </div>
                     </div>
+                    <span>{`--` + commData.userName}</span>
                   </div>
                 ))}
               {ele.comments.length == 0 && (

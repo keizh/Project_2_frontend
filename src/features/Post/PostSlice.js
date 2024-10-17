@@ -1,5 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-
+import { fetchPosts, fetchBookMarks } from "../User/UserSlice";
+import ProvideData from "../../utils/ProvideData";
+import { showAlert } from "../Alert/AlertSlice";
 export const AddPostThunk = createAsyncThunk("post/AddPost", async (data) => {
   const response = await fetch(`http://localhost:5500/api/v1/post/addPost`, {
     method: "POST",
@@ -22,7 +24,7 @@ export const fetchPostsThunk = createAsyncThunk("fetch/fetchPost", async () => {
   });
   const dataRes = await response.json();
   console.log(`posts have been `, dataRes);
-  return dataRes.posts;
+  return dataRes.updatedPostsArray;
 });
 
 export const removeCommentThunk = createAsyncThunk(
@@ -40,7 +42,12 @@ export const removeCommentThunk = createAsyncThunk(
       }
     );
     const dataRes = await response.json();
-    dispatch(fetchPostsThunk());
+    if (data.areWeOnProfilePage == true) {
+      dispatch(fetchBookMarks({ id: data.id }));
+      dispatch(fetchPosts({ id: data.id }));
+    } else {
+      dispatch(fetchPostsThunk());
+    }
     console.log(`completed`);
     return dataRes;
   }
@@ -113,6 +120,28 @@ export const removeBookMarkThunk = createAsyncThunk(
   }
 );
 
+export const deletePostThunk = createAsyncThunk(
+  "delete/post",
+  async (data, { dispatch }) => {
+    const response = await fetch(
+      `http://localhost:5500/api/v1/post/removePost/${data.id}`,
+      {
+        method: "DELETE",
+        headers: {
+          Authorization: localStorage.getItem(`token`),
+        },
+      }
+    );
+    const dataRes = await response.json();
+    const { userId } = ProvideData();
+    dispatch(fetchPosts({ id: userId }));
+    dispatch(
+      showAlert({ message: "Post successfully deleted", color: "orange" })
+    );
+    return dataRes;
+  }
+);
+
 const PostSlice = createSlice({
   name: "PostSlice",
   initialState: {
@@ -127,6 +156,7 @@ const PostSlice = createSlice({
         ...state.posts.map((ele) => {
           if (ele._id == action.payload.postId) {
             ele.likes = [...ele.likes, action.payload.userId];
+            ele.userLiked = true;
           }
           return ele;
         }),
@@ -140,10 +170,51 @@ const PostSlice = createSlice({
             ele.likes = [
               ...ele.likes.filter((userID) => userID != action.payload.userId),
             ];
+            ele.userLiked = false;
           }
           return ele;
         }),
       ];
+    },
+    filterPostSYNC: (state, action) => {
+      console.log(`filtering`, action.payload);
+      if (action.payload == "Rated") {
+        state.posts = state.posts.sort(
+          (a, b) => b.likes.length - a.likes.length
+        );
+      } else {
+        state.posts = state.posts.sort(
+          (a, b) => new Date(a.createdAt) - new Date(b.createdAt)
+        );
+      }
+    },
+    UpdateBookMarkStateInPostsToFalse: (state, action) => {
+      state.posts = [
+        ...state.posts.map((ele) => {
+          if (ele._id == action.payload.postId) {
+            ele.userBookmark = false;
+          }
+          return ele;
+        }),
+      ];
+    },
+    UpdateBookMarkStateInPostsToTrue: (state, action) => {
+      state.posts = [
+        ...state.posts.map((ele) => {
+          if (ele._id == action.payload.postId) {
+            ele.userBookmark = true;
+          }
+          return ele;
+        }),
+      ];
+      // state.otherUserPosts = [
+      //   ...state.otherUserPosts.map((ele) => {
+      //     if (ele._id == action.payload.postId) {
+      //       ele.userBookmark = true;
+      //     }
+      //     return ele;
+      //   }),
+      // ];
     },
   },
   extraReducers: (builder) => {
@@ -223,4 +294,10 @@ const PostSlice = createSlice({
 });
 
 export default PostSlice;
-export const { AddLikes, RemoveLikes } = PostSlice.actions;
+export const {
+  AddLikes,
+  RemoveLikes,
+  filterPostSYNC,
+  UpdateBookMarkStateInPostsToFalse,
+  UpdateBookMarkStateInPostsToTrue,
+} = PostSlice.actions;

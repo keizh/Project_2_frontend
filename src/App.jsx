@@ -16,13 +16,15 @@ import fetchUserDetails from "./features/User/UserSlice";
 function PageDefault({ children }) {
   const Navigate = useNavigate();
   const dispatch = useDispatch();
-  // useEffect(() => {
-  //   if (auth()) {
-  //     Navigate(`/`);
-  //   } else {
-  //     Navigate(`/signin`);
-  //   }
-  // }, [Navigate]);
+  useEffect(() => {
+    if (!auth()) {
+      Navigate(`/signin`);
+    }
+  }, [Navigate]);
+
+  // if (!auth()) {
+  //   Navigate("/signin");
+  // }
 
   return (
     <>
@@ -43,6 +45,8 @@ function SSDefault({ children }) {
 }
 
 export default function App() {
+  const navigate = useNavigate();
+
   return (
     <div className="bg-[#eceff1]">
       <Routes>

@@ -13,9 +13,7 @@ function UserPotentialFollowList() {
   const [friends, setFriends] = useState([]);
   const [search, setSearch] = useState("");
 
-  const { PeopleYouMightKnow, status, error } = useSelector(
-    (state) => state.User
-  );
+  const { PeopleYouMightKnow, status } = useSelector((state) => state.User);
 
   useEffect(() => {
     const fetch = async () => {

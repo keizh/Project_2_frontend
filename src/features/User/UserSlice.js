@@ -38,7 +38,7 @@ export const fetchPotentialPeopleToFollow = createAsyncThunk(
 );
 
 export const postFollowRequest = createAsyncThunk(
-  "post/followRquest",
+  "post/followRequest",
   async (data, { dispatch }) => {
     const response = await fetch(
       `http://localhost:5500/api/v1/user/followRequest`,
@@ -52,8 +52,10 @@ export const postFollowRequest = createAsyncThunk(
       }
     );
     const dataRes = await response.json();
-    // dispatch(fetchPotentialPeopleToFollow());
+    // const { userId } = ProvideData();
+    // dispatch(fetchUserDetails({ id: data.UserProfilePageId }));
     dispatch(followRequestSYNC({ userIdOfReciever: data.userId }));
+    // dispatch(FollowReqSendOtherUserSYNC({ userId: data.userId }));
     return dataRes.potentialUsers;
   }
 );
@@ -172,6 +174,49 @@ export const fetchBookMarks = createAsyncThunk(
   }
 );
 
+export const unFollowUserWHomIAmFollowing = createAsyncThunk(
+  "update/unfollow",
+  async (data, { dispatch }) => {
+    const response = await fetch("http://localhost:5500/api/v1/user/unfollow", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: localStorage.getItem(`token`),
+      },
+      body: JSON.stringify(data),
+    });
+    const dataRes = await response.json();
+    const { userId } = ProvideData();
+    dispatch(fetchUserDetails({ id: userId }));
+    dispatch(showAlert({ message: "Successfully unfollowed", color: "green" }));
+    return dataRes;
+  }
+);
+
+export const removeFollowerThunk = createAsyncThunk(
+  "post/removeFollower",
+  async (data, { dispatch }) => {
+    const response = await fetch(
+      "http://localhost:5500/api/v1/user/removeFollower",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: localStorage.getItem(`token`),
+        },
+        body: JSON.stringify(data),
+      }
+    );
+    const dataRes = await response.json();
+    const { userName, name } = ProvideData();
+    dispatch(fetchUserDetails({ id: userId }));
+    dispatch(
+      showAlert({ message: "Successfully removed Follower", color: "green" })
+    );
+    return dataRes;
+  }
+);
+
 const UserSlice = createSlice({
   name: "UserSlice",
   initialState: {
@@ -225,6 +270,68 @@ const UserSlice = createSlice({
       console.log(`postId:`, action.payload.postId);
       console.log(`ele:`, state.userBookmarks);
     },
+    // this function will syncronously deal with the it
+    // while backend is being taken care of asycnhrously
+    // so after you click follow
+    // step 1: let async job complete , till then show loaders if successfull , we will sync change it too else dont
+    // use this method we will not have to perform one more userDetail fetch request
+    FollowReqSendOtherUserSYNC: (state, action) => {
+      console.log(`running`);
+      state.otherUser.following = state.otherUser?.following?.map((ele) => {
+        if (action.payload.userId == ele.userId) {
+          ele.userIsFollowing = "REQ_SENT";
+        }
+        return ele;
+      });
+      state.otherUser.followers = state.otherUser?.followers?.map((ele) => {
+        if (action.payload.userId == ele.userId) {
+          ele.userIsFollowing = "REQ_SENT";
+        }
+        return ele;
+      });
+    },
+    // for the right top frineds list component
+    postFollowRequestSYNCFollowStatus: (state, action) => {
+      state.PeopleYouMightKnow = state?.PeopleYouMightKnow?.map((ele) => {
+        if (ele._id == action.payload.userId) {
+          ele.isUSERfollowingStatus = "REQ_SENT";
+        }
+        return ele;
+      });
+    },
+    RemoveFollowReqSendOtherUserSYNC: (state, action) => {
+      console.log(`running`);
+      state.otherUser.following = state.otherUser?.following?.map((ele) => {
+        if (action.payload.userId == ele.userId) {
+          ele.userIsFollowing = "NOT_FOLLOWING";
+        }
+        return ele;
+      });
+      state.otherUser.followers = state.otherUser?.followers?.map((ele) => {
+        if (action.payload.userId == ele.userId) {
+          ele.userIsFollowing = "NOT_FOLLOWING";
+        }
+        return ele;
+      });
+    },
+    removeFollowRequestSYNCFollowStatus: (state, action) => {
+      state.PeopleYouMightKnow = state.PeopleYouMightKnow?.map((ele) => {
+        if (ele._id == action.payload.userId) {
+          ele.isUSERfollowingStatus = "NOT_FOLLOWING";
+        }
+        return ele;
+      });
+    },
+    UpdateBookMarkStateInPostsToTrue: (state, action) => {
+      state.posts = [
+        ...state.posts.map((ele) => {
+          if (ele._id == action.payload.postId) {
+            ele.userBookmark = true;
+          }
+          return ele;
+        }),
+      ];
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -275,6 +382,31 @@ const UserSlice = createSlice({
           state.user = action.payload;
         } else {
           state.otherUser = action.payload;
+          state.otherUser.following = state.otherUser.following.map(
+            (userOtherUserIsFollowing) => {
+              const find = state.PeopleYouMightKnow.find(
+                (user) => user._id == userOtherUserIsFollowing.userId
+              );
+              if (find) {
+                userOtherUserIsFollowing.userIsFollowing =
+                  find.isUSERfollowingStatus;
+              }
+              return userOtherUserIsFollowing;
+            }
+          );
+          // state.otherUser.followers=
+          state.otherUser.followers = state.otherUser.followers.map(
+            (userOtherUserFollower) => {
+              const find = state.PeopleYouMightKnow.find(
+                (user) => user._id == userOtherUserFollower.userId
+              );
+              if (find) {
+                userOtherUserFollower.userIsFollowing =
+                  find.isUSERfollowingStatus;
+              }
+              return userOtherUserFollower;
+            }
+          );
         }
       })
       .addCase(fetchUserDetails.rejected, (state, action) => {
@@ -358,6 +490,30 @@ const UserSlice = createSlice({
         state.status = "error";
         state.error = action.error;
       });
+
+    builder
+      .addCase(unFollowUserWHomIAmFollowing.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(unFollowUserWHomIAmFollowing.fulfilled, (state, action) => {
+        state.status = "success";
+      })
+      .addCase(unFollowUserWHomIAmFollowing.rejected, (state, action) => {
+        state.status = "error";
+        state.error = action.error;
+      });
+
+    builder
+      .addCase(removeFollowerThunk.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(removeFollowerThunk.fulfilled, (state, action) => {
+        state.status = "success";
+      })
+      .addCase(removeFollowerThunk.rejected, (state, action) => {
+        state.status = "error";
+        state.error = action.error;
+      });
   },
 });
 
@@ -368,4 +524,8 @@ export const {
   removeFollowRequestSYNC,
   editUserDetailSYNC,
   removeBookMarkSYNC,
+  FollowReqSendOtherUserSYNC,
+  RemoveFollowReqSendOtherUserSYNC,
+  removeFollowRequestSYNCFollowStatus,
+  postFollowRequestSYNCFollowStatus,
 } = UserSlice.actions;
