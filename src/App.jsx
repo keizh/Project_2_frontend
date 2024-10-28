@@ -4,7 +4,7 @@ import SignIn from "./pages/SignIn";
 import AddPost from "./pages/AddPost";
 import Home from "./pages/Home";
 import NavBar from "./components/NavBar";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import auth from "./utils/auth";
 import { useNavigate } from "react-router-dom";
 import AlertSystem from "./components/AlertSystem";
@@ -22,9 +22,9 @@ function PageDefault({ children }) {
     }
   }, [Navigate]);
 
-  // if (!auth()) {
-  //   Navigate("/signin");
-  // }
+  if (!auth()) {
+    Navigate("/signin");
+  }
 
   return (
     <>

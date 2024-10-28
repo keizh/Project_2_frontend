@@ -21,16 +21,9 @@ function Icon() {
 }
 
 export default function AlertSystem({ message, color }) {
-  // const [open, setOpen] = React.useState(true);
   const state = useSelector((state) => state.Alert);
   const dispatch = useDispatch();
-  // useEffect(() => {
-  //   setTimeout(() => {
-  //     if (open) {
-  //       setOpen(false);
-  //     }
-  //   }, 10000);
-  // }, []);
+
   useEffect(() => {
     state.forEach((ele) => {
       const timer = setTimeout(() => {

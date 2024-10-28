@@ -138,14 +138,6 @@ export function SignUp() {
     }
   };
 
-  useEffect(() => {
-    dispatch(showAlert({ message: "tiger", color: "green" }));
-    dispatch(showAlert({ message: "tiger Signed Up", color: "green" }));
-    dispatch(showAlert({ message: "tiger Signed Up", color: "green" }));
-    dispatch(showAlert({ message: "tiger Signed Up", color: "green" }));
-    dispatch(showAlert({ message: "tiger Signed Up", color: "green" }));
-  });
-
   return (
     <section className="grid text-center h-min-screen items-center p-8 relative bg-white">
       <div>
