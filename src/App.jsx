@@ -12,23 +12,12 @@ import FriendSearch from "./pages/FriendSearch";
 import Profile from "./pages/Profile";
 import { useDispatch } from "react-redux";
 import fetchUserDetails from "./features/User/UserSlice";
-import { io } from "socket.io-client";
 
 function PageDefault({ children }) {
   const Navigate = useNavigate();
   const dispatch = useDispatch();
   const socket = useMemo(() => io("http://localhost:5500"), []);
 
-  useEffect(() => {
-    socket.on("connect", () => {
-      console.log(`connection formed client`);
-    });
-
-    return () => {
-      socket.off("connect");
-      socket.disconnect();
-    };
-  });
   useEffect(() => {
     if (!auth()) {
       Navigate(`/signin`);
