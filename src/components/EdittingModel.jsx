@@ -27,6 +27,7 @@ export default function DialogDefault({ open, setOpen }) {
   const onChangeHandler = (e) => {
     const { name, value } = e.target;
     setData((data) => ({ ...data, [name]: value }));
+    console.log(value);
   };
 
   const onSubmit = async () => {
@@ -59,6 +60,7 @@ export default function DialogDefault({ open, setOpen }) {
           />
           <Textarea
             label="Message"
+            name="bio"
             value={data?.bio}
             onChange={onChangeHandler}
           />
