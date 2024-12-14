@@ -69,6 +69,8 @@ function PostCard({
     const { value } = e.target;
     if (value.length <= 150) {
       setCommentData(value);
+    } else {
+      setCommentData("");
     }
   };
 
