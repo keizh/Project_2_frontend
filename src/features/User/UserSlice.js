@@ -181,7 +181,7 @@ export const unFollowUserWHomIAmFollowing = createAsyncThunk(
   "update/unfollow",
   async (data, { dispatch }) => {
     const response = await fetch(
-      "${import.meta.env.VITE_BACKEND}/api/v1/user/unfollow",
+      `${import.meta.env.VITE_BACKEND}/api/v1/user/unfollow`,
       {
         method: "POST",
         headers: {
@@ -203,7 +203,7 @@ export const removeFollowerThunk = createAsyncThunk(
   "post/removeFollower",
   async (data, { dispatch }) => {
     const response = await fetch(
-      "${import.meta.env.VITE_BACKEND}/api/v1/user/removeFollower",
+      `${import.meta.env.VITE_BACKEND}/api/v1/user/removeFollower`,
       {
         method: "POST",
         headers: {
