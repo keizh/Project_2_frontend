@@ -296,7 +296,7 @@ function NavList() {
         color="blue-gray"
         className="font-medium"
       >
-        <NavLink to="/">
+        <NavLink to="/home">
           <ListItem className="flex items-center gap-2 py-2 pr-4">
             Feeds
           </ListItem>
@@ -347,7 +347,7 @@ export default function NavBar() {
   return (
     <Navbar className="mx-auto max-w-screen-2xl px-4 py-2 fixed top-0 left-[50%] translate-x-[-50%] z-[100]">
       <div className="flex items-center  text-blue-gray-900">
-        <NavLink to="/" className={`inline-block`}>
+        <NavLink to="/home" className={`inline-block`}>
           <Typography
             as="a"
             href="#"

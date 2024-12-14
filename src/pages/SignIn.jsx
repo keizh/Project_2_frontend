@@ -28,7 +28,7 @@ export function SignIn() {
     setError(null);
     try {
       const response = await fetch(
-        `http://localhost:5500/api/v1/user/sign-in`,
+        `${import.meta.env.BACKEND}api/v1/user/sign-in`,
         {
           method: "POST",
           body: JSON.stringify(data),
@@ -46,7 +46,7 @@ export function SignIn() {
         );
         setTimeout(() => {
           setData(intialdata);
-          Navigate("/");
+          Navigate("/home");
         }, 3000);
       } else {
         setError(dataRes.message);
@@ -62,7 +62,7 @@ export function SignIn() {
     // 2. loading will prevent it from jumping to / route if it is in the
     // process of moving to home page during those 3 seconds , in which alert and loading button will appear
     if (auth() == true && !loading) {
-      Navigate(`/`);
+      Navigate(`/home`);
     }
   });
 

@@ -4,7 +4,7 @@ export const addBookMarkThunk = createAsyncThunk(
   "post/AddBookmark",
   async (data, { dispatch }) => {
     const response = await fetch(
-      `http://localhost:5500/api/v1/bookmark/addBookmark`,
+      `${import.meta.env.BACKEND}api/v1/bookmark/addBookmark`,
       {
         method: "POST",
         headers: {
@@ -27,7 +27,7 @@ export const removeBookMarkThunk = createAsyncThunk(
   "post/RemoveBookmark",
   async (data, { dispatch }) => {
     const response = await fetch(
-      `http://localhost:5500/api/v1/bookmark/removeBookMark/${data.postId}`,
+      `${import.meta.env.BACKEND}api/v1/bookmark/removeBookMark/${data.postId}`,
       {
         method: "DELETE",
         headers: {

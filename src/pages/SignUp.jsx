@@ -99,7 +99,7 @@ export function SignUp() {
     if (result.success) {
       try {
         const response = await fetch(
-          `http://localhost:5500/api/v1/user/sign-up`,
+          `${import.meta.env.BACKEND}api/v1/user/sign-up`,
           {
             method: "POST",
             body: JSON.stringify(data),

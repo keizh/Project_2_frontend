@@ -3,20 +3,23 @@ import { fetchPosts, fetchBookMarks } from "../User/UserSlice";
 import ProvideData from "../../utils/ProvideData";
 import { showAlert } from "../Alert/AlertSlice";
 export const AddPostThunk = createAsyncThunk("post/AddPost", async (data) => {
-  const response = await fetch(`http://localhost:5500/api/v1/post/addPost`, {
-    method: "POST",
-    body: JSON.stringify(data),
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: localStorage.getItem(`token`),
-    },
-  });
+  const response = await fetch(
+    `${import.meta.env.BACKEND}api/v1/post/addPost`,
+    {
+      method: "POST",
+      body: JSON.stringify(data),
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: localStorage.getItem(`token`),
+      },
+    }
+  );
   const dataRes = await response.json();
   return dataRes;
 });
 
 export const fetchPostsThunk = createAsyncThunk("fetch/fetchPost", async () => {
-  const response = await fetch(`http://localhost:5500/api/v1/post/posts`, {
+  const response = await fetch(`${import.meta.env.BACKEND}api/v1/post/posts`, {
     method: "GET",
     headers: {
       Authorization: localStorage.getItem(`token`),
@@ -31,7 +34,7 @@ export const removeCommentThunk = createAsyncThunk(
   "delete/removeComment",
   async (data, { dispatch }) => {
     const response = await fetch(
-      `http://localhost:5500/api/v1/post/removeCommentCommentOwner`,
+      `${import.meta.env.BACKEND}api/v1/post/removeCommentCommentOwner`,
       {
         method: "POST",
         headers: {
@@ -57,7 +60,7 @@ export const addCommentThunk = createAsyncThunk(
   "post/AddComment",
   async (data, { dispatch }) => {
     const response = await fetch(
-      `http://localhost:5500/api/v1/post/addComment`,
+      `${import.meta.env.BACKEND}api/v1/post/addComment`,
       {
         method: "POST",
         headers: {
@@ -74,7 +77,7 @@ export const addCommentThunk = createAsyncThunk(
 );
 
 export const addLikeThunk = createAsyncThunk("post/AddLike", async (data) => {
-  const response = await fetch(`http://localhost:5500/api/v1/post/like`, {
+  const response = await fetch(`${import.meta.env.BACKEND}api/v1/post/like`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -89,14 +92,17 @@ export const addLikeThunk = createAsyncThunk("post/AddLike", async (data) => {
 export const removeLikeThunk = createAsyncThunk(
   "post/removeLike",
   async (data) => {
-    const response = await fetch(`http://localhost:5500/api/v1/post/unlike`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: localStorage.getItem(`token`),
-      },
-      body: JSON.stringify(data),
-    });
+    const response = await fetch(
+      `${import.meta.env.BACKEND}api/v1/post/unlike`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: localStorage.getItem(`token`),
+        },
+        body: JSON.stringify(data),
+      }
+    );
     const dataRes = await response.json();
     return dataRes;
   }
@@ -107,14 +113,17 @@ export const removeLikeThunk = createAsyncThunk(
 export const removeBookMarkThunk = createAsyncThunk(
   "post/removeBookmark",
   async (data) => {
-    const response = await fetch(`http://localhost:5500/api/v1/post/unlike`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: localStorage.getItem(`token`),
-      },
-      body: JSON.stringify(data),
-    });
+    const response = await fetch(
+      `${import.meta.env.BACKEND}api/v1/post/unlike`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: localStorage.getItem(`token`),
+        },
+        body: JSON.stringify(data),
+      }
+    );
     const dataRes = await response.json();
     return dataRes;
   }
@@ -124,7 +133,7 @@ export const deletePostThunk = createAsyncThunk(
   "delete/post",
   async (data, { dispatch }) => {
     const response = await fetch(
-      `http://localhost:5500/api/v1/post/removePost/${data.id}`,
+      `${import.meta.env.BACKEND}api/v1/post/removePost/${data.id}`,
       {
         method: "DELETE",
         headers: {

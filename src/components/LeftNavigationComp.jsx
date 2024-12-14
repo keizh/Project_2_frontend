@@ -8,7 +8,7 @@ function LeftNavigationComp() {
   return (
     <div className="flex flex-col gap-2 mb-5 max-w-[250px]">
       <Button
-        onClick={() => navigate("/")}
+        onClick={() => navigate("/home")}
         color="white"
         className="flex pl-[20%]  gap-5 text-[16px]"
       >
