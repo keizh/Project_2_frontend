@@ -6,7 +6,7 @@ export const fetchPotentialPeopleToFollowSearch = createAsyncThunk(
   "fetch/potentialPeopleToFollowSearch",
   async (data) => {
     const response = await fetch(
-      `${import.meta.env.BACKEND}api/v1/user/YetToFollow/${data.search}`,
+      `${import.meta.env.BACKEND}/api/v1/user/YetToFollow/${data.search}`,
       {
         method: "GET",
         headers: {
@@ -23,7 +23,7 @@ export const fetchPotentialPeopleToFollow = createAsyncThunk(
   "fetch/potentialPeopleToFollow",
   async () => {
     const response = await fetch(
-      `${import.meta.env.BACKEND}api/v1/user/YetToFollow`,
+      `${import.meta.env.BACKEND}/api/v1/user/YetToFollow`,
       {
         method: "GET",
         headers: {
@@ -41,7 +41,7 @@ export const postFollowRequest = createAsyncThunk(
   "post/followRequest",
   async (data, { dispatch }) => {
     const response = await fetch(
-      `${import.meta.env.BACKEND}api/v1/user/followRequest`,
+      `${import.meta.env.BACKEND}/api/v1/user/followRequest`,
       {
         method: "POST",
         headers: {
@@ -64,7 +64,7 @@ export const removeFollowRequest = createAsyncThunk(
   "post/removefollowRquest",
   async (data, { dispatch }) => {
     const response = await fetch(
-      `${import.meta.env.BACKEND}api/v1/user/removefollowRequest`,
+      `${import.meta.env.BACKEND}/api/v1/user/removefollowRequest`,
       {
         method: "POST",
         headers: {
@@ -87,7 +87,7 @@ export const fetchUserDetails = createAsyncThunk(
     console.log(data);
     console.log(`fetching User Detials`);
     const response = await fetch(
-      `${import.meta.env.BACKEND}api/v1/user/${data.id}`,
+      `${import.meta.env.BACKEND}/api/v1/user/${data.id}`,
       {
         method: "GET",
         headers: {
@@ -105,7 +105,7 @@ export const acceptFollowRequest = createAsyncThunk(
   "Post/addFollower",
   async (data, { dispatch }) => {
     const response = await fetch(
-      `${import.meta.env.BACKEND}api/v1/user/addFollower`,
+      `${import.meta.env.BACKEND}/api/v1/user/addFollower`,
       {
         method: "POST",
         headers: {
@@ -125,7 +125,7 @@ export const editUserDetail = createAsyncThunk(
   "post/updatingUserDetails",
   async (data, { dispatch }) => {
     const response = await fetch(
-      `${import.meta.env.BACKEND}api/v1/user/update`,
+      `${import.meta.env.BACKEND}/api/v1/user/update`,
       {
         method: "POST",
         headers: {
@@ -148,7 +148,7 @@ export const editUserDetail = createAsyncThunk(
 
 export const fetchPosts = createAsyncThunk("fetch/Posts", async (data) => {
   const response = await fetch(
-    `${import.meta.env.BACKEND}api/v1/post/fetchPosts/${data.id}`,
+    `${import.meta.env.BACKEND}/api/v1/post/fetchPosts/${data.id}`,
     {
       method: "GET",
       headers: {
@@ -164,7 +164,7 @@ export const fetchBookMarks = createAsyncThunk(
   "fetch/BookMarks",
   async (data) => {
     const response = await fetch(
-      `${import.meta.env.BACKEND}api/v1/bookmark/BookMarks/${data.id}`,
+      `${import.meta.env.BACKEND}/api/v1/bookmark/BookMarks/${data.id}`,
       {
         method: "GET",
         headers: {
@@ -181,7 +181,7 @@ export const unFollowUserWHomIAmFollowing = createAsyncThunk(
   "update/unfollow",
   async (data, { dispatch }) => {
     const response = await fetch(
-      "${import.meta.env.BACKEND}api/v1/user/unfollow",
+      "${import.meta.env.BACKEND}/api/v1/user/unfollow",
       {
         method: "POST",
         headers: {
@@ -203,7 +203,7 @@ export const removeFollowerThunk = createAsyncThunk(
   "post/removeFollower",
   async (data, { dispatch }) => {
     const response = await fetch(
-      "${import.meta.env.BACKEND}api/v1/user/removeFollower",
+      "${import.meta.env.BACKEND}/api/v1/user/removeFollower",
       {
         method: "POST",
         headers: {

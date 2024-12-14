@@ -28,7 +28,7 @@ export function SignIn() {
     setError(null);
     try {
       const response = await fetch(
-        `${import.meta.env.BACKEND}api/v1/user/sign-in`,
+        `${import.meta.env.BACKEND}/api/v1/user/sign-in`,
         {
           method: "POST",
           body: JSON.stringify(data),
