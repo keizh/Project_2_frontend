@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { Routes, Route, Outlet, Navigate } from "react-router-dom";
 import SignUp from "./pages/SignUp";
 import SignIn from "./pages/SignIn";
@@ -13,20 +14,14 @@ import Profile from "./pages/Profile";
 import { useDispatch } from "react-redux";
 import fetchUserDetails from "./features/User/UserSlice";
 
-function PageDefault({ children }) {
+function PageDefault() {
   const Navigate = useNavigate();
   const dispatch = useDispatch();
-  const socket = useMemo(() => io("http://localhost:5500"), []);
-
   useEffect(() => {
     if (!auth()) {
       Navigate(`/signin`);
     }
   }, [Navigate]);
-
-  // if (!auth()) {
-  //   Navigate("/signin");
-  // }
 
   useEffect(() => {}, []);
 
