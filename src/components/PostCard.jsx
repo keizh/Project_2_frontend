@@ -69,8 +69,6 @@ function PostCard({
     const { value } = e.target;
     if (value.length <= 150) {
       setCommentData(value);
-    } else {
-      setCommentData("");
     }
   };
 
@@ -84,8 +82,8 @@ function PostCard({
         await dispatch(fetchPosts({ id }));
         await dispatch(fetchBookMarks({ id }));
       }
-      setCommentData("");
     }
+    setCommentData("");
   };
 
   const day = date.getDate();

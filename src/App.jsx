@@ -81,6 +81,7 @@ export default function App() {
             </SSDefault>
           }
         />
+        <Route path="/" element={<Navigate to="/home" replace />} />
         <Route path="/" element={<PageDefault />}>
           <Route path="home" element={<Home />} />
           <Route path="addpost" element={<AddPost />} />
