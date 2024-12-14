@@ -33,7 +33,7 @@ function Home() {
     <div className="pt-[100px] max-w-screen-2xl mx-auto flex gap-5 min-h-screen px-4">
       <div className="lg:w-[50%] xl:w-[20%]  h-[100px] hidden lg:block">
         <LeftNavigationComp />
-        <div className="flex pl-[20%] items-center gap-4 my-[50px]  py-3 rounded-lg">
+        <div className="flex  items-center gap-2 my-[50px]  py-3 rounded-lg">
           <Avatar
             variant="rounded"
             withBorder={true}

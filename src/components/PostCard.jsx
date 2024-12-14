@@ -21,7 +21,7 @@ import {
 } from "@material-tailwind/react";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import ProvideData from "../utils/ProvideData";
 import { removeBookMarkSYNC } from "../features/User/UserSlice";
 import { useDispatch, useSelector } from "react-redux";
@@ -64,6 +64,7 @@ function PostCard({
   // const [bookmarked, setBookmark] = useState(ele.userBookmark);
   const { userName, userId, name } = ProvideData();
   const { user } = useSelector((state) => state.User);
+  const inputRef = useRef();
 
   const handlerCommentData = (e) => {
     const { value } = e.target;
@@ -84,6 +85,9 @@ function PostCard({
       }
     }
     setCommentData("");
+    console.log(`before`, inputRef.current.value);
+    inputRef.current.value = "";
+    console.log(`after`, inputRef.current.value);
   };
 
   const day = date.getDate();
@@ -253,11 +257,12 @@ function PostCard({
         <div className="flex justify-between flex-col gap-4  ">
           <div className="  sm:w-[100%] flex items-center justify-between sm:gap-3">
             <Input
-              value={commentData}
+              // value={commentData}
               onChange={handlerCommentData}
               variant="static"
               label="comments"
               className=""
+              ref={inputRef}
             />
             <span>{commentData.length}/150</span>
             <Button

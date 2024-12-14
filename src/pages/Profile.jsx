@@ -32,19 +32,12 @@ function Profile() {
 
   useEffect(() => {
     const fetchData = async () => {
-      await dispatch(fetchUserDetails({ id }));
-      await dispatch(fetchPosts({ id }));
-      await dispatch(fetchBookMarks({ id }));
+      dispatch(fetchUserDetails({ id }));
+      dispatch(fetchPosts({ id }));
+      dispatch(fetchBookMarks({ id }));
     };
     fetchData();
   }, [id, userId, dispatch]);
-
-  const followHandler = async (userId) => {
-    await dispatch();
-  };
-  const unFollowHandler = async (userId) => {
-    await dispatch();
-  };
 
   return (
     <div className="pt-[100px] max-w-screen-2xl mx-auto flex gap-5 min-h-screen px-5">
