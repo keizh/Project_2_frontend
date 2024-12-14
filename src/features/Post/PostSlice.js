@@ -4,7 +4,7 @@ import ProvideData from "../../utils/ProvideData";
 import { showAlert } from "../Alert/AlertSlice";
 export const AddPostThunk = createAsyncThunk("post/AddPost", async (data) => {
   const response = await fetch(
-    `${import.meta.env.BACKEND}/api/v1/post/addPost`,
+    `${import.meta.env.VITE_BACKEND}/api/v1/post/addPost`,
     {
       method: "POST",
       body: JSON.stringify(data),
@@ -19,12 +19,15 @@ export const AddPostThunk = createAsyncThunk("post/AddPost", async (data) => {
 });
 
 export const fetchPostsThunk = createAsyncThunk("fetch/fetchPost", async () => {
-  const response = await fetch(`${import.meta.env.BACKEND}/api/v1/post/posts`, {
-    method: "GET",
-    headers: {
-      Authorization: localStorage.getItem(`token`),
-    },
-  });
+  const response = await fetch(
+    `${import.meta.env.VITE_BACKEND}/api/v1/post/posts`,
+    {
+      method: "GET",
+      headers: {
+        Authorization: localStorage.getItem(`token`),
+      },
+    }
+  );
   const dataRes = await response.json();
   console.log(`posts have been `, dataRes);
   return dataRes.updatedPostsArray;
@@ -34,7 +37,7 @@ export const removeCommentThunk = createAsyncThunk(
   "delete/removeComment",
   async (data, { dispatch }) => {
     const response = await fetch(
-      `${import.meta.env.BACKEND}/api/v1/post/removeCommentCommentOwner`,
+      `${import.meta.env.VITE_BACKEND}/api/v1/post/removeCommentCommentOwner`,
       {
         method: "POST",
         headers: {
@@ -60,7 +63,7 @@ export const addCommentThunk = createAsyncThunk(
   "post/AddComment",
   async (data, { dispatch }) => {
     const response = await fetch(
-      `${import.meta.env.BACKEND}/api/v1/post/addComment`,
+      `${import.meta.env.VITE_BACKEND}/api/v1/post/addComment`,
       {
         method: "POST",
         headers: {
@@ -77,14 +80,17 @@ export const addCommentThunk = createAsyncThunk(
 );
 
 export const addLikeThunk = createAsyncThunk("post/AddLike", async (data) => {
-  const response = await fetch(`${import.meta.env.BACKEND}/api/v1/post/like`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: localStorage.getItem(`token`),
-    },
-    body: JSON.stringify(data),
-  });
+  const response = await fetch(
+    `${import.meta.env.VITE_BACKEND}/api/v1/post/like`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: localStorage.getItem(`token`),
+      },
+      body: JSON.stringify(data),
+    }
+  );
   const dataRes = await response.json();
   return dataRes;
 });
@@ -93,7 +99,7 @@ export const removeLikeThunk = createAsyncThunk(
   "post/removeLike",
   async (data) => {
     const response = await fetch(
-      `${import.meta.env.BACKEND}/api/v1/post/unlike`,
+      `${import.meta.env.VITE_BACKEND}/api/v1/post/unlike`,
       {
         method: "POST",
         headers: {
@@ -114,7 +120,7 @@ export const removeBookMarkThunk = createAsyncThunk(
   "post/removeBookmark",
   async (data) => {
     const response = await fetch(
-      `${import.meta.env.BACKEND}/api/v1/post/unlike`,
+      `${import.meta.env.VITE_BACKEND}/api/v1/post/unlike`,
       {
         method: "POST",
         headers: {
@@ -133,7 +139,7 @@ export const deletePostThunk = createAsyncThunk(
   "delete/post",
   async (data, { dispatch }) => {
     const response = await fetch(
-      `${import.meta.env.BACKEND}/api/v1/post/removePost/${data.id}`,
+      `${import.meta.env.VITE_BACKEND}/api/v1/post/removePost/${data.id}`,
       {
         method: "DELETE",
         headers: {
